@@ -250,6 +250,29 @@ def test():
     #     data.append(temp)
     return data
 
+@app.route('/delete_record',methods=['POST','GET'])
+def delete_record():
+    file_id = eval(str(request.data, encoding='utf-8'))['file_id']
+    file = FileInfo.query.get(file_id)
+    db.session.delete(file)
+    db.session.commit()
+    return {'msg':'删除成功'}
+
+
+@app.route('/update_user_info',methods=['POST','GET'])
+def update_user_info():
+    user_info = eval(str(request.data, encoding='utf-8'))
+    user = UserInfo.query.filter_by(user_id = user_info['user_id']).first()
+    if user:
+        user.user_name = user_info['user_name']
+        user.user_sex = user_info['user_sex']
+        user.user_phone = user_info['user_phone']
+        user.user_psw = user_info['user_psw']
+        db.session.commit()
+        new_user = UserInfo.query.filter_by(user_id = user_info['user_id']).first()
+        return {'msg':'ok', 'data':dict(new_user),'code':0}
+    else:
+        return {'msg':'fail,no such user_id'}
 
 
 if __name__ == '__main__':
